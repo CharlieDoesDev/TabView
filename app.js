@@ -1,230 +1,211 @@
-// app.js
-document.addEventListener('DOMContentLoaded', () => {
-    // Element refs
-    const textInput      = document.getElementById('textInput');
-    const docTitleInput  = document.getElementById('docTitle');
-    const addDocBtn      = document.getElementById('addDocBtn');
-    const tabList        = document.getElementById('tabList');
-    const oneWordBtn     = document.getElementById('oneWordBtn');
-    const highlightBtn   = document.getElementById('highlightBtn');
-    const prevBtn        = document.getElementById('prevBtn');
-    const nextBtn        = document.getElementById('nextBtn');
-    const decreaseFontBtn= document.getElementById('decreaseFont');
-    const increaseFontBtn= document.getElementById('increaseFont');
-    const themeToggleBtn = document.getElementById('themeToggle');
-    const fullTextDiv    = document.getElementById('fullText');
-    const singleWordDiv  = document.getElementById('singleWord');
-  
-    // State
-    let documents           = [];
-    let currentDocIndex     = null;
-    let oneWordActive       = false;
-    let highlightActive     = false;
-    let currentWords        = [];
-    let currentWordIndex    = 0;
-    let currentHighlightIdx = 0;
-    let baseFontSize        = 18;
-  
-    // Add new pasted document
-    function addDocument() {
-      const text = textInput.value.trim();
-      if (!text) {
-        alert('Please paste some text first.');
-        return;
-      }
-      const title = docTitleInput.value.trim() || `Document ${documents.length+1}`;
-      documents.push({ title, text });
-      const opt = document.createElement('option');
-      opt.value = documents.length - 1;
-      opt.textContent = title;
-      tabList.appendChild(opt);
-      tabList.value = opt.value;
-      textInput.value = '';
-      docTitleInput.value = '';
-      displayContent(opt.value);
-    }
-  
-    // Show chosen document in the fullText area
-    function displayContent(idx) {
-      currentDocIndex = parseInt(idx, 10);
-      if (isNaN(currentDocIndex)) return;
-      const doc = documents[currentDocIndex];
-  
-      // Exit any mode
-      if (oneWordActive)      toggleOneWordMode();
-      if (highlightActive)    toggleHighlightMode();
-  
-      // Render paragraphs
-      fullTextDiv.innerHTML = '';
-      doc.text.split(/\n{2,}/).forEach(par => {
-        if (!par.trim()) return;
-        const p = document.createElement('p');
-        p.textContent = par;
-        fullTextDiv.appendChild(p);
-      });
-  
-      // Restore defaults
-      fullTextDiv.style.fontSize = `${baseFontSize}px`;
-      fullTextDiv.style.display   = 'block';
-      singleWordDiv.style.display = 'none';
-    }
-  
-    // Wrap each word in a span.word for highlighting
-    function wrapWordsInSpans() {
-      document
-        .querySelectorAll('#fullText p')
-        .forEach(p => {
-          const words = p.textContent.split(' ');
-          p.innerHTML = '';
-          words.forEach((w, i) => {
-            const span = document.createElement('span');
-            span.className = 'word';
-            span.textContent = w;
-            p.appendChild(span);
-            if (i < words.length - 1) {
-              p.appendChild(document.createTextNode(' '));
-            }
-          });
-        });
-    }
-  
-    // One‑Word Mode toggle
-    function toggleOneWordMode() {
-      if (oneWordActive) {
-        // Exit
-        singleWordDiv.style.display = 'none';
-        fullTextDiv.style.display   = 'block';
-        oneWordBtn.textContent      = 'One‑Word Mode';
-        prevBtn.style.display       = 'none';
-        nextBtn.style.display       = 'none';
-        oneWordActive = false;
-      } else {
-        // Enter
-        const doc = documents[currentDocIndex];
-        currentWords     = doc.text.split(/\s+/);
-        currentWordIndex = 0;
-        fullTextDiv.style.display   = 'none';
-        singleWordDiv.style.display = 'block';
-        singleWordDiv.textContent   = currentWords[0] || '';
-        oneWordBtn.textContent      = 'Exit One‑Word Mode';
-        prevBtn.style.display       = 'inline-block';
-        nextBtn.style.display       = 'inline-block';
-        highlightBtn.disabled       = true;
-        oneWordActive = true;
-      }
-    }
-  
-    // Highlight Mode toggle
-    function toggleHighlightMode() {
-      if (highlightActive) {
-        // Exit
-        const highlighted = fullTextDiv.querySelector('.highlight');
-        if (highlighted) highlighted.classList.remove('highlight');
-        highlightBtn.textContent = 'Highlight Mode';
-        prevBtn.style.display    = 'none';
-        nextBtn.style.display    = 'none';
-        highlightActive          = false;
-        oneWordBtn.disabled      = false;
-      } else {
-        // Enter
-        wrapWordsInSpans();
-        const spans = fullTextDiv.querySelectorAll('.word');
-        if (!spans.length) return;
-        currentHighlightIdx = 0;
-        spans[0].classList.add('highlight');
-        highlightBtn.textContent = 'Exit Highlight Mode';
-        prevBtn.style.display    = 'inline-block';
-        nextBtn.style.display    = 'inline-block';
-        oneWordBtn.disabled      = true;
-        highlightActive = true;
-      }
-    }
-  
-    // Advance or rewind in current mode
-    function showNextWord() {
-      if (oneWordActive) {
-        if (currentWordIndex < currentWords.length - 1) {
-          currentWordIndex++;
-          singleWordDiv.textContent = currentWords[currentWordIndex];
-        }
-      } else if (highlightActive) {
-        advanceHighlight();
-      }
-    }
-    function showPrevWord() {
-      if (oneWordActive) {
-        if (currentWordIndex > 0) {
-          currentWordIndex--;
-          singleWordDiv.textContent = currentWords[currentWordIndex];
-        }
-      } else if (highlightActive) {
-        rewindHighlight();
-      }
-    }
-  
-    // Move the highlight in full text
-    function advanceHighlight() {
-      const spans = fullTextDiv.querySelectorAll('.word');
-      if (!spans.length) return;
-      spans[currentHighlightIdx].classList.remove('highlight');
-      if (currentHighlightIdx < spans.length - 1) {
-        currentHighlightIdx++;
-      }
-      spans[currentHighlightIdx].classList.add('highlight');
-      spans[currentHighlightIdx].scrollIntoView({ behavior:'smooth', block:'center' });
-    }
-    function rewindHighlight() {
-      const spans = fullTextDiv.querySelectorAll('.word');
-      if (!spans.length) return;
-      spans[currentHighlightIdx].classList.remove('highlight');
-      if (currentHighlightIdx > 0) {
-        currentHighlightIdx--;
-      }
-      spans[currentHighlightIdx].classList.add('highlight');
-      spans[currentHighlightIdx].scrollIntoView({ behavior:'smooth', block:'center' });
-    }
-  
-    // Adjust font size
-    function updateFontSize(delta) {
-      baseFontSize = Math.max(12, baseFontSize + delta);
-      fullTextDiv.style.fontSize = `${baseFontSize}px`;
-    }
-  
-    // Toggle light/dark theme
-    function toggleTheme() {
-      document.body.classList.toggle('dark');
-      themeToggleBtn.textContent = document.body.classList.contains('dark')
-        ? 'Light Mode'
-        : 'Dark Mode';
-    }
-  
-    // Keyboard shortcuts
-    document.addEventListener('keydown', e => {
-      if (oneWordActive || highlightActive) {
-        if (e.key === 'ArrowRight' || e.key === ' ') {
-          e.preventDefault();
-          showNextWord();
-        } else if (e.key === 'ArrowLeft') {
-          e.preventDefault();
-          showPrevWord();
-        } else if (e.key === 'Escape') {
-          if (oneWordActive)      toggleOneWordMode();
-          if (highlightActive)    toggleHighlightMode();
-        }
-      }
-    });
-  
-    // Event bindings
-    addDocBtn.addEventListener('click', addDocument);
-    tabList.addEventListener('change', () => {
-      if (tabList.value !== '') displayContent(tabList.value);
-    });
-    oneWordBtn.addEventListener('click', toggleOneWordMode);
-    highlightBtn.addEventListener('click', toggleHighlightMode);
-    nextBtn.addEventListener('click', showNextWord);
-    prevBtn.addEventListener('click', showPrevWord);
-    increaseFontBtn.addEventListener('click', () => updateFontSize(2));
-    decreaseFontBtn.addEventListener('click', () => updateFontSize(-2));
-    themeToggleBtn.addEventListener('click', toggleTheme);
-  });
-  
+ 
+(() => {  
+  const textInput      = document.getElementById('textInput');  
+  const docTitleInput  = document.getElementById('docTitle');  
+  const addDocBtn      = document.getElementById('addDocBtn');  
+  const tabList        = document.getElementById('tabList');  
+  const oneWordModeSel = document.getElementById('oneWordMode');  
+  const oneWordDelayIn = document.getElementById('oneWordDelay');  
+  const oneWordBtn     = document.getElementById('oneWordBtn');  
+  const highlightBtn   = document.getElementById('highlightBtn');  
+  const prevBtn        = document.getElementById('prevBtn');  
+  const nextBtn        = document.getElementById('nextBtn');  
+  const decreaseFont   = document.getElementById('decreaseFont');  
+  const increaseFont   = document.getElementById('increaseFont');  
+  const themeToggle    = document.getElementById('themeToggle');  
+  const fullTextDiv    = document.getElementById('fullText');  
+  const singleWordDiv  = document.getElementById('singleWord');  
+
+  let documents        = [];  
+  let currentDocIndex  = null;  
+  let oneWordActive    = false;  
+  let highlightActive  = false;  
+  let autoTimer        = null;  
+  let baseFontSize     = 18;  
+  let currentWords     = [];  
+  let currentChars     = [];  
+  let idxCurrent       = 0;  
+
+  function addDocument() {  
+    const text = textInput.value.trim();  
+    if (!text) return alert('Paste text first.');  
+    const title = docTitleInput.value.trim() || `Document ${documents.length+1}`;  
+    documents.push({ title, text });  
+    const opt = document.createElement('option');  
+    opt.value = documents.length - 1;  
+    opt.textContent = title;  
+    tabList.appendChild(opt);  
+    tabList.value = opt.value;  
+    textInput.value = '';  
+    docTitleInput.value = '';  
+    displayContent(opt.value);  
+  }  
+
+  function displayContent(i) {  
+    currentDocIndex = +i;  
+    if (isNaN(currentDocIndex)) return;  
+    exitOneWordMode();  
+    exitHighlightMode();  
+    const doc = documents[currentDocIndex];  
+    fullTextDiv.innerHTML = '';  
+    doc.text.split(/\n{2,}/).forEach(p => {  
+      if (!p.trim()) return;  
+      const el = document.createElement('p'); el.textContent = p;  
+      fullTextDiv.appendChild(el);  
+    });  
+    fullTextDiv.style.fontSize = baseFontSize + 'px';  
+    fullTextDiv.style.display   = 'block';  
+    singleWordDiv.style.display = 'none';  
+  }  
+
+  function wrapSpans() {  
+    document.querySelectorAll('#fullText p').forEach(p => {  
+      const words = p.textContent.split(' ');  
+      p.innerHTML = '';  
+      words.forEach((w,i) => {  
+        const sp = document.createElement('span');  
+        sp.className = 'word'; sp.textContent = w;  
+        p.appendChild(sp);  
+        if(i<words.length-1) p.appendChild(document.createTextNode(' '));  
+      });  
+    });  
+  }  
+
+  function exitOneWordMode() {  
+    if (autoTimer) clearInterval(autoTimer);  
+    singleWordDiv.style.display = 'none';  
+    fullTextDiv.style.display   = 'block';  
+    prevBtn.style.display       = 'none';  
+    nextBtn.style.display       = 'none';  
+    oneWordBtn.textContent      = 'Start One‑Word Mode';  
+    highlightBtn.disabled       = false;  
+    oneWordActive = false;  
+  }  
+
+  function exitHighlightMode() {  
+    const hl = fullTextDiv.querySelector('.highlight');  
+    if (hl) hl.classList.remove('highlight');  
+    prevBtn.style.display       = 'none';  
+    nextBtn.style.display       = 'none';  
+    highlightBtn.textContent    = 'Highlight Mode';  
+    oneWordBtn.disabled         = false;  
+    highlightActive = false;  
+  }  
+
+  function toggleOneWordMode() {  
+    if (!oneWordActive) enterOneWordMode(); else exitOneWordMode();  
+  }  
+
+  function enterOneWordMode() {  
+    const mode  = oneWordModeSel.value;  
+    const delay = parseFloat(oneWordDelayIn.value) * 1000;  
+    const txt   = documents[currentDocIndex].text;  
+    fullTextDiv.style.display   = 'none';  
+    singleWordDiv.style.display = 'flex';  
+    highlightBtn.disabled   = true;  
+    oneWordBtn.textContent  = 'Exit One‑Word Mode';  
+    oneWordActive = true;  
+    idxCurrent = 0;  
+    if (mode === 'char') {  
+      currentChars = txt.split('');  
+      showChar();  
+      autoTimer = setInterval(showChar, delay);  
+    } else {  
+      currentWords = txt.split(/\s+/);  
+      showWord();  
+      if (mode === 'word') {  
+        autoTimer = setInterval(showWord, delay);  
+        prevBtn.style.display = 'none';  
+        nextBtn.style.display = 'none';  
+      } else {  
+        prevBtn.style.display = 'inline-block';  
+        nextBtn.style.display = 'inline-block';  
+      }  
+    }  
+  }  
+
+  function showWord() {  
+    if (idxCurrent >= currentWords.length) return clearInterval(autoTimer);  
+    singleWordDiv.textContent = currentWords[idxCurrent++];  
+  }  
+
+  function showChar() {  
+    if (idxCurrent >= currentChars.length) return clearInterval(autoTimer);  
+    singleWordDiv.textContent = currentChars[idxCurrent++];  
+  }  
+
+  function toggleHighlightMode() {  
+    if (!highlightActive) {  
+      enterHighlightMode();  
+    } else exitHighlightMode();  
+  }  
+
+  function enterHighlightMode() {  
+    exitOneWordMode();  
+    wrapSpans();  
+    const spans = fullTextDiv.querySelectorAll('.word');  
+    if (!spans.length) return;  
+    idxCurrent = 0;  
+    spans[0].classList.add('highlight');  
+    highlightBtn.textContent = 'Exit Highlight Mode';  
+    prevBtn.style.display    = 'inline-block';  
+    nextBtn.style.display    = 'inline-block';  
+    oneWordBtn.disabled      = true;  
+    highlightActive = true;  
+  }  
+
+  function advanceHighlight(by = 1) {  
+    const spans = fullTextDiv.querySelectorAll('.word');  
+    spans[idxCurrent].classList.remove('highlight');  
+    idxCurrent = Math.min(spans.length-1, idxCurrent+by);  
+    spans[idxCurrent].classList.add('highlight');  
+    spans[idxCurrent].scrollIntoView({ behavior:'smooth', block:'center' });  
+  }  
+
+  function rewindHighlight(by = 1) {  
+    const spans = fullTextDiv.querySelectorAll('.word');  
+    spans[idxCurrent].classList.remove('highlight');  
+    idxCurrent = Math.max(0, idxCurrent-by);  
+    spans[idxCurrent].classList.add('highlight');  
+    spans[idxCurrent].scrollIntoView({ behavior:'smooth', block:'center' });  
+  }  
+
+  function updateFontSize(delta) {  
+    baseFontSize = Math.max(12, baseFontSize+delta);  
+    fullTextDiv.style.fontSize = baseFontSize+'px';  
+  }  
+
+  function toggleTheme() {  
+    document.body.classList.toggle('dark');  
+    themeToggle.textContent = document.body.classList.contains('dark') ? 'Light Mode' : 'Dark Mode';  
+  }  
+
+  document.addEventListener('keydown', e => {  
+    if (oneWordActive || highlightActive) {  
+      if (e.key === 'ArrowRight' || e.key === ' ') {  
+        e.preventDefault();  
+        if (oneWordActive) showWord(); else advanceHighlight();  
+      } else if (e.key === 'ArrowLeft') {  
+        e.preventDefault();  
+        if (highlightActive) rewindHighlight();  
+      } else if (e.key === 'Escape') {  
+        if (oneWordActive) exitOneWordMode();  
+        if (highlightActive) exitHighlightMode();  
+      }  
+    }  
+  });  
+
+  addDocBtn.addEventListener('click', addDocument);  
+  tabList.addEventListener('change', () => displayContent(tabList.value));  
+  oneWordBtn.addEventListener('click', toggleOneWordMode);  
+  highlightBtn.addEventListener('click', toggleHighlightMode);  
+  nextBtn.addEventListener('click', () => {  
+    if (oneWordActive) showWord(); else if (highlightActive) advanceHighlight();  
+  });  
+  prevBtn.addEventListener('click', () => {  
+    if (highlightActive) rewindHighlight();  
+  });  
+  increaseFont.addEventListener('click', () => updateFontSize(2));  
+  decreaseFont.addEventListener('click', () => updateFontSize(-2));  
+  themeToggle.addEventListener('click', toggleTheme);  
+})();

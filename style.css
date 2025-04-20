@@ -1,23 +1,30 @@
-/* style.css */
-/* Import OpenDyslexic from jsDelivr */
 @import url('https://cdn.jsdelivr.net/npm/open-dyslexic/open-dyslexic-regular.css');
+
+:root {
+  --bg-light: #FDF6E3;
+  --text-light: #111;
+  --bg-dark: #111;
+  --text-dark: #EEE;
+  --accent: #83C6F5;
+  --highlight: #FFFB91;
+}
+
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
-  background: #FDF6E3;
-  color: #111;
+  background: var(--bg-light);
+  color: var(--text-light);
   font-family: 'OpenDyslexic', Verdana, sans-serif;
   font-size: 18px;
   line-height: 1.5;
 }
 
 body.dark {
-  background: #111;
-  color: #EEE;
-}
-
-body.dark a {
-  color: #83C6F5;
+  background: var(--bg-dark);
+  color: var(--text-dark);
 }
 
 header {
@@ -25,56 +32,62 @@ header {
   padding: 1em;
 }
 
-#inputSection {
-  padding: 1em;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5em;
-  justify-content: center;
-}
-
-#inputSection textarea {
-  flex: 1 1 60%;
-  min-width: 200px;
-  font-size: 1em;
-  padding: 0.5em;
-}
-
-#inputSection input,
-#inputSection button {
-  flex: 1 1 20%;
-  min-width: 100px;
-}
-
+#inputSection,
 #controlsSection {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5em;
-  align-items: center;
-  padding: 0.5em 1em;
+  padding: 1em;
+  justify-content: center;
   background: #EEE;
 }
 
-#controlsSection label,
-#controlsSection select,
-#controlsSection button {
-  margin-right: 0.5em;
+textarea,
+select.input,
+input.input,
+.btn {
+  font-size: 1em;
+  padding: 0.5em 1em;
+  border: 1px solid #CCC;
+  border-radius: 8px;
+  background: #FFF;
+  color: inherit;
 }
 
-#controlsSection select,
-#controlsSection button {
-  font-size: 1em;
-  padding: 0.4em 0.6em;
+textarea {
+  flex: 1 1 60%;
+  min-width: 200px;
+  resize: vertical;
+}
+
+select.input,
+input.input {
+  flex: 1 1 15%;
+  min-width: 120px;
+}
+
+.btn {
+  flex: 1 1 auto;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn:hover {
+  background: #F0F0F0;
+}
+
+.btn:active {
+  background: #E0E0E0;
+}
+
+.navBtn {
+  display: none;
 }
 
 @media (max-width: 600px) {
   #controlsSection {
     flex-direction: column;
     align-items: stretch;
-  }
-  #controlsSection select,
-  #controlsSection button {
-    width: 100%;
   }
 }
 
@@ -86,12 +99,9 @@ header {
 
 #fullText p {
   margin-bottom: 1em;
-}
-
-#fullText {
+  text-align: left;
   letter-spacing: 0.1em;
   word-spacing: 0.2em;
-  display: block;
 }
 
 #singleWord {
@@ -104,11 +114,8 @@ header {
   align-items: center;
 }
 
-.navBtn {
-  display: none;
-}
-
 .highlight {
-  background-color: #FFFB91;
+  background-color: var(--highlight);
   padding: 0 2px;
+  border-radius: 4px;
 }

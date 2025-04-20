@@ -1,39 +1,48 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dyslexia‑Friendly Reader</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
     <h1>Dyslexia‑Friendly Reader</h1>
-    <p>Paste text below from any page, then use the controls to customize your reading view.</p>
+    <p>Paste text from any page below, then customize your reading mode.</p>
   </header>
 
   <section id="inputSection">
-    <textarea id="textInput" placeholder="Paste the article text here…" rows="6"></textarea>
-    <input type="text" id="docTitle" placeholder="Optional: Title for this text" />
-    <button id="addDocBtn">Add Document</button>
+    <textarea id="textInput" placeholder="Paste article text here…" rows="6"></textarea>
+    <input type="text" id="docTitle" placeholder="Optional title">
+    <button id="addDocBtn" class="btn">Add Document</button>
   </section>
 
   <section id="controlsSection">
     <label for="tabList">Select Document:</label>
-    <select id="tabList">
+    <select id="tabList" class="input">
       <option value="">(No document loaded)</option>
     </select>
 
-    <button id="oneWordBtn">One‑Word Mode</button>
-    <button id="highlightBtn">Highlight Mode</button>
-    <button id="prevBtn" class="navBtn">← Prev</button>
-    <button id="nextBtn" class="navBtn">Next →</button>
+    <label for="oneWordMode">One‑Word Mode:</label>
+    <select id="oneWordMode" class="input">
+      <option value="manual">Manual</option>
+      <option value="word">Timed per Word</option>
+      <option value="char">Timed per Character</option>
+    </select>
 
-    <button id="decreaseFont">A‑</button>
-    <button id="increaseFont">A+</button>
-    <button id="themeToggle">Dark Mode</button>
+    <label for="oneWordDelay">Delay (s):</label>
+    <input type="number" id="oneWordDelay" class="input" min="0.1" step="0.1" value="1">
+    <button id="oneWordBtn" class="btn">Start One‑Word Mode</button>
+
+    <button id="highlightBtn" class="btn">Highlight Mode</button>
+    <button id="prevBtn" class="btn navBtn">← Prev</button>
+    <button id="nextBtn" class="btn navBtn">Next →</button>
+
+    <button id="decreaseFont" class="btn">A‑</button>
+    <button id="increaseFont" class="btn">A+</button>
+    <button id="themeToggle" class="btn">Dark Mode</button>
   </section>
 
   <main id="content">
