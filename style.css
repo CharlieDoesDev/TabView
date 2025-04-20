@@ -1,0 +1,114 @@
+/* style.css */
+/* Import OpenDyslexic from jsDelivr */
+@import url('https://cdn.jsdelivr.net/npm/open-dyslexic/open-dyslexic-regular.css');
+
+body {
+  margin: 0;
+  background: #FDF6E3;
+  color: #111;
+  font-family: 'OpenDyslexic', Verdana, sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+body.dark {
+  background: #111;
+  color: #EEE;
+}
+
+body.dark a {
+  color: #83C6F5;
+}
+
+header {
+  text-align: center;
+  padding: 1em;
+}
+
+#inputSection {
+  padding: 1em;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  justify-content: center;
+}
+
+#inputSection textarea {
+  flex: 1 1 60%;
+  min-width: 200px;
+  font-size: 1em;
+  padding: 0.5em;
+}
+
+#inputSection input,
+#inputSection button {
+  flex: 1 1 20%;
+  min-width: 100px;
+}
+
+#controlsSection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  align-items: center;
+  padding: 0.5em 1em;
+  background: #EEE;
+}
+
+#controlsSection label,
+#controlsSection select,
+#controlsSection button {
+  margin-right: 0.5em;
+}
+
+#controlsSection select,
+#controlsSection button {
+  font-size: 1em;
+  padding: 0.4em 0.6em;
+}
+
+@media (max-width: 600px) {
+  #controlsSection {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  #controlsSection select,
+  #controlsSection button {
+    width: 100%;
+  }
+}
+
+#content {
+  max-width: 700px;
+  margin: 1em auto;
+  padding: 0 1em;
+}
+
+#fullText p {
+  margin-bottom: 1em;
+}
+
+#fullText {
+  letter-spacing: 0.1em;
+  word-spacing: 0.2em;
+  display: block;
+}
+
+#singleWord {
+  display: none;
+  font-size: 2em;
+  text-align: center;
+  height: 60vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.navBtn {
+  display: none;
+}
+
+.highlight {
+  background-color: #FFFB91;
+  padding: 0 2px;
+}

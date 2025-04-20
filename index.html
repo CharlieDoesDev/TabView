@@ -1,0 +1,46 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dyslexia‑Friendly Reader</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Dyslexia‑Friendly Reader</h1>
+    <p>Paste text below from any page, then use the controls to customize your reading view.</p>
+  </header>
+
+  <section id="inputSection">
+    <textarea id="textInput" placeholder="Paste the article text here…" rows="6"></textarea>
+    <input type="text" id="docTitle" placeholder="Optional: Title for this text" />
+    <button id="addDocBtn">Add Document</button>
+  </section>
+
+  <section id="controlsSection">
+    <label for="tabList">Select Document:</label>
+    <select id="tabList">
+      <option value="">(No document loaded)</option>
+    </select>
+
+    <button id="oneWordBtn">One‑Word Mode</button>
+    <button id="highlightBtn">Highlight Mode</button>
+    <button id="prevBtn" class="navBtn">← Prev</button>
+    <button id="nextBtn" class="navBtn">Next →</button>
+
+    <button id="decreaseFont">A‑</button>
+    <button id="increaseFont">A+</button>
+    <button id="themeToggle">Dark Mode</button>
+  </section>
+
+  <main id="content">
+    <div id="fullText" role="main"></div>
+    <div id="singleWord" aria-live="polite"></div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
